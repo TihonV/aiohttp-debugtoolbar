@@ -26,14 +26,20 @@ class RequestVarsDebugPanel(DebugPanel):
         self.data = data = {}
         request = self.request
         yield from request.post()
-        data.update({
-            'get': [(k, request.query.getall(k))
-                    for k in sorted(request.query)],
-            'post': [(k, saferepr(request.post().getall(k)))
-                     for k in sorted(request.post())],
-            'cookies': [(k, v) for k, v in sorted(request.cookies.items())],
-            'attrs': [(k, v) for k, v in sorted(request.items())],
-        })
+        if request.method == 'get':
+            data.update({
+                'get': [(k, request.GET.getall(k)) for k in sorted(request.GET)],
+                # 'post': [(k, saferepr(request.POST.getall(k))) for k in sorted(request.POST)],
+                'cookies': [(k, v) for k, v in sorted(request.cookies.items())],
+                'attrs': [(k, v) for k, v in sorted(request.items())],
+            })
+        elif request.method == 'post':
+            data.update({
+                # 'get': [(k, request.GET.getall(k)) for k in sorted(request.GET)],
+                'post': [(k, saferepr(request.POST.getall(k))) for k in sorted(request.POST)],
+                'cookies': [(k, v) for k, v in sorted(request.cookies.items())],
+                'attrs': [(k, v) for k, v in sorted(request.items())],
+            })
 
         # TODO: think about aiohttp_security
 
